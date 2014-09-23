@@ -44,17 +44,16 @@ var app = {
     });
   },
 
-
   addFriend: function(username) {
     console.log(this);
     //app.friends[username] = true;
   },
 
-  handleSubmit: function(username, message){
+  handleSubmit: function(username, message, room){
     var data = {
       'username': username,
       'text': message,
-      'roomname': '5chan'
+      'roomname': room,
     };
 
     app.send(data);
@@ -63,7 +62,7 @@ var app = {
   displayMessages: function(chats) {
     _.each(chats, function(chat){
       app.chats.push(chat);
-      $('#chats').append('<p class="chat" data-username="'+chat.username+'"><a href="#">'+chat.username+"</a>: "+app.escapeStr(chat.text)+": "+ chat.roomname+'</p>');
+      $('#chats').append('<p class="chat" data-username="'+app.escapeStr(chat.username)+'"><a href="#">'+app.escapeStr(chat.username)+"</a>: "+app.escapeStr(chat.text)+": "+app.escapeStr(chat.roomname)+'</p>');
     });
   },
 
@@ -105,7 +104,7 @@ var app = {
 
   addRoom: function(roomArray) {
     for (var i = 0; i < roomArray.length; i++) {
-      $('.roomSelect').append('<p data-roomname="'+roomArray[i]+'" href="#">'+roomArray[i]+'</p>');
+      $('.roomSelect').append('<p data-roomname="'+app.escapeStr(roomArray[i])+'" href="#">'+app.escapeStr(roomArray[i])+'</p>');
     }
 
     $('.roomSelect p').on('click', function(){
@@ -131,7 +130,7 @@ $('button.refresh').on('click', function(){
 });
 
 $('#send .submit').on('click', function(event){
-  app.handleSubmit($('#username').val(), $('#message').val());
+  app.handleSubmit($('#username').val(), $('#message').val(), $('#roomname').val());
 });
 
 
