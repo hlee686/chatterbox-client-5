@@ -5,30 +5,21 @@ var app = {
   friends: {},
 
   init: function() {
-    $('#send .submit').on('click', function(event){
-      app.handleSubmit($('#message').val());
-    });
     $('p.chat').on('click', function(){
       app.addFriend($(this).data('username'));
-    });
-    $('button.refresh').on('click', function(){
-      app.refresh();
     });
   },
 
   send: function(message) {
     $.ajax({
-    // always use this url
       url: app.server,
       type: 'POST',
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
         console.log(data);
-        console.log('chatterbox: Message sent');
       },
       error: function (data) {
-        // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
         console.error('chatterbox: Failed to send message');
       }
     });
@@ -36,19 +27,16 @@ var app = {
 
   fetch: function(){
     $.ajax({
-    // always use this url
       url: app.server,
       type: 'GET',
-      data: 'jsonp',
+      data: {'order': '-createdAt'},
       contentType: 'application/json',
       success: function (data) {
         console.log('Retrieved messages.');
-        console.log(data.results);
         app.displayMessages(data.results);
         app.init();
       },
       error: function (data) {
-        // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
         console.error('chatterbox: Failed to get message');
       }
     });
@@ -73,19 +61,17 @@ var app = {
   },
 
   handleSubmit: function(message){
-    var data = {};
-    data.text = message;
-    data.username = "jgladch";
-    data.roomname = "lobby";
-    console.log(data);
+    var data = {
+      'username': 'jgladch',
+      'text': message,
+      'roomname': '5chan'
+    };
+
     app.send(data);
   },
 
   displayMessages: function(data) {
     _.each(data, function(chat){
-      // var safeChat = jsesc(chat.text);
-      // console.log(safeChat);
-      //debugger;
       $('#chats').append('<p class="chat" data-username="'+chat.username+'">'+chat.username+": "+escapeStr(chat.text)+": "+ chat.roomname+'</p>');
     });
     console.log(data.results);
@@ -98,16 +84,17 @@ var app = {
   }
 };
 
-
-var message = {
-  'username': 'shawndrost',
-  'text': 'trololo',
-  'roomname': '4chan'
-};
-
 var escapeStr = function(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 };
+
+$('button.refresh').on('click', function(){
+  app.refresh();
+});
+
+$('#send .submit').on('click', function(event){
+  app.handleSubmit($('#message').val());
+});
 
 app.fetch();
 
