@@ -4,12 +4,12 @@ var app = {
   server: 'https://api.parse.com/1/classes/chatterbox',
   friends: {},
   init: function() {
-    $('p.chat.username').on('click', function(){
-      app.addFriend($(this).data('username'));
-    });
-    $('#send .submit').on('submit', function(){
+    $('#send .submit').on('click', function(event){
       console.log("send to handlesubmit");
       app.handleSubmit();
+    });
+    $('p.chat.username').on('click', function(){
+      app.addFriend($(this).data('username'));
     });
   },
   send: function(message) {
@@ -63,6 +63,10 @@ var app = {
   },
   handleSubmit: function(){
     console.log('Just got handled');
+    var message = {};
+    var chat = $('#message').val();
+    message['text']=chat;
+    app.send(message);
   }
 };
 
@@ -78,6 +82,7 @@ var displayMessages = function(data) {
   });
   console.log(data.results);
 };
+
 
 var message = {
   'username': 'shawndrost',
