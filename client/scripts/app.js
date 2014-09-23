@@ -33,6 +33,7 @@ var app = {
       data: {'order': '-createdAt'},
       contentType: 'application/json',
       success: function (data) {
+        app.getRooms(data.results);
         app.displayMessages(data.results);
         app.init();
       },
@@ -42,14 +43,6 @@ var app = {
     });
   },
 
-  addMessage: function(message) {
-    $('#chats').append('<p class="chat username" data-username="'+message.username+'">'+message.username+" : "+
-            app.escapeStr(message.text)+" : "+ message.roomname+'</p>');
-  },
-
-  addRoom: function(roomName) {
-    $('#roomSelect').append('<div class="'+roomName+'">'+roomName+'</div>');
-  },
 
   addFriend: function(username) {
     console.log(this);
@@ -68,18 +61,45 @@ var app = {
 
   displayMessages: function(data) {
     _.each(data, function(chat){
-      $('#chats').append('<p class="chat" data-username="'+chat.username+'">'+chat.username+": "+app.escapeStr(chat.text)+": "+ chat.roomname+'</p>');
+      $('#chats').append('<p class="chat" data-username="'+chat.username+'"><a href="#">'+chat.username+"</a>: "+app.escapeStr(chat.text)+": "+ chat.roomname+'</p>');
     });
   },
 
   refresh: function(){
+    //removes event listeners from messages and rooms
+    //reset rooms array
+    //fetches new messages
     $('p.chat').off('click');
     $('p.chat').remove();
+    $('.roomSelect a').off('click');
+    $('.roomSelect a').remove();
+    app.rooms = [];
     app.fetch();
   },
 
   escapeStr: function(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  },
+
+  getRooms: function(data){
+    var storage = {};
+    //iterate through chats and get rooms !== undefined
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].roomname !== undefined) {
+        storage[data[i].roomname] = true;
+      }
+    }
+    for (var key in storage) {
+      app.rooms.push(key);
+    }
+
+    app.addRoom(app.rooms);
+  },
+
+  addRoom: function(roomArray) {
+    for (var i = 0; i < roomArray.length; i++) {
+      $('.roomSelect ul').append('<a data-roomname="'+roomArray[i]+'">'+roomArray[i]+'</li>');
+    }
   },
 };
 

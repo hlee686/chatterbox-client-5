@@ -93,3 +93,27 @@ span.top{
 button.refresh {
     display: inline;
 }
+div#roomselect{
+    margin-top: 10px;
+}
+
+.roomSelect {
+    width: 650px;
+    margin: 10px auto 0px auto;
+    text-align: left;
+    background: white;
+    padding: 50px 60px;
+    border: solid #ddd;
+    border-width: 0 1px 1px 1px;
+}
+
+.roomSelect h1 {
+    margin-top: 0;
+    font-size: 35px;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+
+.roomSelect a {
+    margin: 0px 7px 0px 7px;
+}
