@@ -3,7 +3,7 @@
 var app = {
   server: 'https://api.parse.com/1/classes/chatterbox',
   friends: {},
-  rooms: {},
+  rooms: [],
 
   init: function() {
     $('p.chat').on('click', function(){
@@ -18,7 +18,7 @@ var app = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
-        console.log(data);
+        app.refresh();
       },
       error: function (data) {
         console.error('chatterbox: Failed to send message');
@@ -33,7 +33,6 @@ var app = {
       data: {'order': '-createdAt'},
       contentType: 'application/json',
       success: function (data) {
-        console.log('Retrieved messages.');
         app.displayMessages(data.results);
         app.init();
       },
@@ -43,13 +42,9 @@ var app = {
     });
   },
 
-  clearMessages: function(){
-    $('#chats').children().remove();
-  },
-
   addMessage: function(message) {
     $('#chats').append('<p class="chat username" data-username="'+message.username+'">'+message.username+" : "+
-            escapeStr(message.text)+" : "+ message.roomname+'</p>');
+            app.escapeStr(message.text)+" : "+ message.roomname+'</p>');
   },
 
   addRoom: function(roomName) {
@@ -73,20 +68,19 @@ var app = {
 
   displayMessages: function(data) {
     _.each(data, function(chat){
-      $('#chats').append('<p class="chat" data-username="'+chat.username+'">'+chat.username+": "+escapeStr(chat.text)+": "+ chat.roomname+'</p>');
+      $('#chats').append('<p class="chat" data-username="'+chat.username+'">'+chat.username+": "+app.escapeStr(chat.text)+": "+ chat.roomname+'</p>');
     });
-    console.log(data.results);
   },
 
   refresh: function(){
     $('p.chat').off('click');
     $('p.chat').remove();
     app.fetch();
-  }
-};
+  },
 
-var escapeStr = function(str) {
+  escapeStr: function(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  },
 };
 
 $('button.refresh').on('click', function(){
