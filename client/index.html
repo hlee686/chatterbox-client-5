@@ -7,6 +7,8 @@
 
     <!-- dependencies -->
     <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/jsesc/jsesc.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
     <!-- your scripts -->
     <script src="scripts/config.js"></script>
     <script src="scripts/app.js"></script>
@@ -15,6 +17,14 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
+      <div id='sendMessage'>
+        <form id="send" action="#">
+          <input type="text" id="message" value="Message goes here">
+          <input type="submit" class="submit">
+        </form>
+      </div>
+      <div id='chats'></div>
+      <div id='roomSelect'></div>
     </div>
   </body>
 </html>
