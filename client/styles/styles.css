@@ -82,3 +82,14 @@ form input[type=text] {
 .spinner img {
     padding: 10px;
 }
+
+div#chats {
+    height: 500px;
+    overflow-y: scroll;
+}
+span.top{
+    display: inline;
+}
+button.refresh {
+    display: inline;
+}

@@ -14,17 +14,21 @@
   </head>
   <body>
     <div id="main">
-      <h1>chatterbox</h1>
+      <span class="top">
+        <h1>chatterbox</h1>
+        <button type="button" class="refresh">Refresh</button>
+      </span>
       <!-- Your HTML goes here! -->
-      <div id='sendMessage'>
-      <div id='send'>
-          <input type="text" id="message" value="Message goes here">
-          <input type="submit" class="submit">
-          <!--<button class='submit' >Press me</button>-->
-      </div>
-      </div>
+      
       <div id='chats'></div>
+
+      <div id='send'>
+        <input type="text" id="message" value="Message goes here">
+        <input type="submit" class="submit">
+      </div>
+
       <div id='roomSelect'></div>
+
     </div>
     <script src="scripts/app.js"></script>
   </body>

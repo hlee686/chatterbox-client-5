@@ -3,15 +3,19 @@
 var app = {
   server: 'https://api.parse.com/1/classes/chatterbox',
   friends: {},
+
   init: function() {
     $('#send .submit').on('click', function(event){
-      console.log("send to handlesubmit");
-      app.handleSubmit();
+      app.handleSubmit($('#message').val());
     });
-    $('p.chat.username').on('click', function(){
+    $('p.chat').on('click', function(){
       app.addFriend($(this).data('username'));
     });
+    $('button.refresh').on('click', function(){
+      app.refresh();
+    });
   },
+
   send: function(message) {
     $.ajax({
     // always use this url
@@ -20,6 +24,7 @@ var app = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
+        console.log(data);
         console.log('chatterbox: Message sent');
       },
       error: function (data) {
@@ -28,6 +33,7 @@ var app = {
       }
     });
   },
+
   fetch: function(){
     $.ajax({
     // always use this url
@@ -38,7 +44,7 @@ var app = {
       success: function (data) {
         console.log('Retrieved messages.');
         console.log(data.results);
-        displayMessages(data);
+        app.displayMessages(data.results);
         app.init();
       },
       error: function (data) {
@@ -47,40 +53,49 @@ var app = {
       }
     });
   },
+
   clearMessages: function(){
     $('#chats').children().remove();
   },
+
   addMessage: function(message) {
     $('#chats').append('<p class="chat username" data-username="'+message.username+'">'+message.username+" : "+
             escapeStr(message.text)+" : "+ message.roomname+'</p>');
   },
+
   addRoom: function(roomName) {
     $('#roomSelect').append('<div class="'+roomName+'">'+roomName+'</div>');
   },
+
   addFriend: function(username) {
     console.log(this);
     //app.friends[username] = true;
   },
-  handleSubmit: function(){
-    console.log('Just got handled');
-    var message = {};
-    var chat = $('#message').val();
-    message['text']=chat;
-    app.send(message);
-  }
-};
 
-var displayMessages = function(data) {
-  //var msgs = JSON.parse(data);
-  var chats = data.results;
-  _.each(chats, function(chat){
-    // var safeChat = jsesc(chat.text);
-    // console.log(safeChat);
-    //debugger;
-    $('#chats').append('<p class="chat username" data-username="'+chat.username+'">'+chat.username+" : "+
-            escapeStr(chat.text)+" : "+ chat.roomname+'</p>');
-  });
-  console.log(data.results);
+  handleSubmit: function(message){
+    var data = {};
+    data.text = message;
+    data.username = "jgladch";
+    data.roomname = "lobby";
+    console.log(data);
+    app.send(data);
+  },
+
+  displayMessages: function(data) {
+    _.each(data, function(chat){
+      // var safeChat = jsesc(chat.text);
+      // console.log(safeChat);
+      //debugger;
+      $('#chats').append('<p class="chat" data-username="'+chat.username+'">'+chat.username+": "+escapeStr(chat.text)+": "+ chat.roomname+'</p>');
+    });
+    console.log(data.results);
+  },
+
+  refresh: function(){
+    $('p.chat').off('click');
+    $('p.chat').remove();
+    app.fetch();
+  }
 };
 
 
