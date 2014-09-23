@@ -3,6 +3,7 @@
 var app = {
   server: 'https://api.parse.com/1/classes/chatterbox',
   friends: {},
+  rooms: {},
 
   init: function() {
     $('p.chat').on('click', function(){
@@ -60,9 +61,9 @@ var app = {
     //app.friends[username] = true;
   },
 
-  handleSubmit: function(message){
+  handleSubmit: function(username, message){
     var data = {
-      'username': 'jgladch',
+      'username': username,
       'text': message,
       'roomname': '5chan'
     };
@@ -93,7 +94,7 @@ $('button.refresh').on('click', function(){
 });
 
 $('#send .submit').on('click', function(event){
-  app.handleSubmit($('#message').val());
+  app.handleSubmit($('#username').val(), $('#message').val());
 });
 
 app.fetch();

@@ -84,7 +84,7 @@ form input[type=text] {
 }
 
 div#chats {
-    height: 500px;
+    height: 300px;
     overflow-y: scroll;
 }
 span.top{
