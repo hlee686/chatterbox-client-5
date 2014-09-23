@@ -3,6 +3,7 @@
 var app = {
   server: 'https://api.parse.com/1/classes/chatterbox',
   friends: {},
+  chats: [],
   rooms: [],
 
   init: function() {
@@ -59,8 +60,9 @@ var app = {
     app.send(data);
   },
 
-  displayMessages: function(data) {
-    _.each(data, function(chat){
+  displayMessages: function(chats) {
+    _.each(chats, function(chat){
+      app.chats.push(chat);
       $('#chats').append('<p class="chat" data-username="'+chat.username+'"><a href="#">'+chat.username+"</a>: "+app.escapeStr(chat.text)+": "+ chat.roomname+'</p>');
     });
   },
@@ -69,12 +71,17 @@ var app = {
     //removes event listeners from messages and rooms
     //reset rooms array
     //fetches new messages
-    $('p.chat').off('click');
+    app.removeListeners();
     $('p.chat').remove();
-    $('.roomSelect a').off('click');
-    $('.roomSelect a').remove();
+    $('.roomSelect p').remove();
+    app.chats = [];
     app.rooms = [];
     app.fetch();
+  },
+
+  removeListeners: function() {
+    $('p.chat').off('click');
+    $('.roomSelect p').off('click');
   },
 
   escapeStr: function(str) {
@@ -98,8 +105,24 @@ var app = {
 
   addRoom: function(roomArray) {
     for (var i = 0; i < roomArray.length; i++) {
-      $('.roomSelect ul').append('<a data-roomname="'+roomArray[i]+'">'+roomArray[i]+'</li>');
+      $('.roomSelect').append('<p data-roomname="'+roomArray[i]+'" href="#">'+roomArray[i]+'</p>');
     }
+
+    $('.roomSelect p').on('click', function(){
+      app.filterForRoom($(this).data('roomname'));
+    });
+  },
+
+  filterForRoom: function(roomname) {
+    var filteredChats = [];
+    for (var i = 0; i < app.chats.length; i++) {
+      if (app.chats[i].roomname === roomname) {
+        filteredChats.push(app.chats[i]);
+      }
+    }
+    app.removeListeners();
+    $('p.chat').remove();
+    app.displayMessages(filteredChats);
   },
 };
 
@@ -110,6 +133,7 @@ $('button.refresh').on('click', function(){
 $('#send .submit').on('click', function(event){
   app.handleSubmit($('#username').val(), $('#message').val());
 });
+
 
 app.fetch();
 

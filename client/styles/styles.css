@@ -114,6 +114,7 @@ div#roomselect{
     padding: 5px;
 }
 
-.roomSelect a {
+.roomSelect p {
     margin: 0px 7px 0px 7px;
+    display: inline;
 }
