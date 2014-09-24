@@ -7,6 +7,8 @@ var app = {
   rooms: [],
 
   init: function() {
+    app.username = window.location.search.substr(10);
+
     $('p.chat').on('click', function(){
       app.addFriend($(this).data('username'));
     });
@@ -59,10 +61,17 @@ var app = {
     app.send(data);
   },
 
-  displayMessages: function(chats) {
+  renderMessages: function(message) {
+    var $user = $('<div>', {class: 'user'}).text(message.username);
+    var $text = $('<div>', {class: 'user'}).text(message.text);
+    var $message = $('<div>', {class: 'chat', 'data-id': message.objectId}).append($user, $text);
+    return $message;
+  },
+
+  displayMessages: function(chats) { //iterate through chats, have them rendered & prepend to #chats
     _.each(chats, function(chat){
-      app.chats.push(chat);
-      $('#chats').append('<p class="chat" data-username="'+app.escapeStr(chat.username)+'"><a href="#">'+app.escapeStr(chat.username)+"</a>: "+app.escapeStr(chat.text)+": "+app.escapeStr(chat.roomname)+'</p>');
+      var $html = app.renderMessages(chat);
+      $('#chats').prepend($html);
     });
   },
 
@@ -70,17 +79,11 @@ var app = {
     //removes event listeners from messages and rooms
     //reset rooms array
     //fetches new messages
-    app.removeListeners();
-    $('p.chat').remove();
+    $('div.chat').remove();
     $('.roomSelect p').remove();
     app.chats = [];
     app.rooms = [];
     app.fetch();
-  },
-
-  removeListeners: function() {
-    $('p.chat').off('click');
-    $('.roomSelect p').off('click');
   },
 
   escapeStr: function(str) {
