@@ -3,15 +3,12 @@
 var app = {
   server: 'https://api.parse.com/1/classes/chatterbox',
   friends: {},
-  chats: [],
-  rooms: [],
+  chats: {},
+  rooms: {},
+  username: window.location.search.substr(10),
 
   init: function() {
-    app.username = window.location.search.substr(10);
-
-    $('p.chat').on('click', function(){
-      app.addFriend($(this).data('username'));
-    });
+    
   },
 
   send: function(message) {
@@ -21,12 +18,19 @@ var app = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
-        app.refresh();
+        app.displayMessage(app.renderMessage(data));
+        app.successMsg();
       },
       error: function (data) {
         console.error('chatterbox: Failed to send message');
       }
     });
+  },
+
+  successMsg: function(){
+    var $message = $('<div>', {class: 'success'}).text('Message Sent!');
+    $('body').append($message);
+    setTimeout(function(){$('div.success').remove();}, 3000);
   },
 
   fetch: function(){
@@ -36,8 +40,8 @@ var app = {
       data: {'order': '-createdAt'},
       contentType: 'application/json',
       success: function (data) {
-        app.getRooms(data.results);
-        app.displayMessages(data.results);
+        // app.getRooms(data.results);
+        app.processMessages(data.results);
         app.init();
       },
       error: function (data) {
@@ -46,48 +50,53 @@ var app = {
     });
   },
 
-  addFriend: function(username) {
-    console.log(this);
-    //app.friends[username] = true;
+  processMessages: function(chats) {
+    _.each(chats, function(chat){
+      if (!app.chats[chat.objectId] && chat.username !== '' && chat.text !== '') {
+        if (chat.roomname !== '' && app.rooms[chat.roomname] === undefined) {
+          app.rooms[chat.roomname] = true;
+        }
+        app.chats[chat.objectId] = true;
+        var $html = app.renderMessage(chat);
+        app.displayMessage($html);
+      }
+    });
+    app.chatListener();
   },
 
-  handleSubmit: function(username, message, room){
-    var data = {
-      'username': username,
-      'text': message,
-      'roomname': room,
-    };
-
-    app.send(data);
-  },
-
-  renderMessages: function(message) {
-    var $user = $('<div>', {class: 'user'}).text(message.username);
+  renderMessage: function(message) {
+    var $user = $('<div>', {class: 'user', 'data-username': message.username}).text(message.username);
     var $text = $('<div>', {class: 'user'}).text(message.text);
     var $message = $('<div>', {class: 'chat', 'data-id': message.objectId}).append($user, $text);
     return $message;
   },
 
-  displayMessages: function(chats) { //iterate through chats, have them rendered & prepend to #chats
-    _.each(chats, function(chat){
-      var $html = app.renderMessages(chat);
-      $('#chats').prepend($html);
+  displayMessage: function(renderedMessage) { //iterate through chats, have them rendered & prepend to #chats
+    $('#chats').append(renderedMessage);
+  },
+
+  addFriend: function(username) {
+    console.log(this);
+    //app.friends[username] = true;
+  },
+
+  formatSend: function(username, message, room){
+    var data = {
+      'username': username,
+      'text': message,
+      'roomname': room,
+    };
+    app.send(data);
+  },
+
+  chatListener: function(){
+    $('div.chat').on('click', function(){
+      app.addFriend($(this).data('username'));
     });
   },
 
   refresh: function(){
-    //removes event listeners from messages and rooms
-    //reset rooms array
-    //fetches new messages
-    $('div.chat').remove();
-    $('.roomSelect p').remove();
-    app.chats = [];
-    app.rooms = [];
     app.fetch();
-  },
-
-  escapeStr: function(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   },
 
   getRooms: function(data){
@@ -124,7 +133,7 @@ var app = {
     }
     app.removeListeners();
     $('p.chat').remove();
-    app.displayMessages(filteredChats);
+    app.displayMessage(filteredChats);
   },
 };
 
@@ -133,7 +142,10 @@ $('button.refresh').on('click', function(){
 });
 
 $('#send .submit').on('click', function(event){
-  app.handleSubmit($('#username').val(), $('#message').val(), $('#roomname').val());
+  var $message = $('#message').val();
+  var $username = $('#username').val();
+  var $room = $('#roomname').val();
+  app.formatSend($username, $message, $room);
 });
 
 
