@@ -8,7 +8,8 @@ var app = {
   username: window.location.search.substr(10),
 
   init: function() {
-    
+    app.fetch();
+    setInterval(app.fetch.bind(app), 1000);
   },
 
   send: function(message) {
@@ -18,7 +19,6 @@ var app = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
-        app.displayMessage(app.renderMessage(data));
         app.successMsg();
       },
       error: function (data) {
@@ -96,6 +96,7 @@ var app = {
   },
 
   refresh: function(){
+    debugger;
     app.fetch();
   },
 
@@ -149,5 +150,5 @@ $('#send .submit').on('click', function(event){
 });
 
 
-app.fetch();
+app.init();
 
